@@ -18,22 +18,24 @@ get_qr_code() {
     fi
 }
 
-add_message_number() {
-    # Add number and message to QR code. Input is <phone number> <message>.
+add_message_number_other() {
+    # Add number, message and possibly other text to QR code. Input is <phone number> <message> <other>.
     # Output stored in processing/<phone number>/<message>.
     TELNUMMER=$1
     MEDDELANDE=$2
+    ANNAT=$3
     mkdir -p processing/$TELNUMMER
-    if [[ ! -f processing/$TELNUMMER/$MEDDELANDE.$OUT_FORMAT ]]; then
-        echo "Add message and number to $TELNUMMER $MEDDELANDE"
+    if [[ ! -f processing/$TELNUMMER/$MEDDELANDE.$OUT_FORMAT.skip ]]; then
+        echo "Add message and number to $TELNUMMER; $MEDDELANDE; $ANNAT"
         cp input/$TELNUMMER/$MEDDELANDE.$FILE_FORMAT processing/tmp.$FILE_FORMAT # Make a copy to modify
         if [[ ! $FILE_FORMAT == "png" ]]; then
             echo "Convert format"
             convert -density 1200 -resize 1000x1000 processing/tmp.$FILE_FORMAT processing/tmp.png
             rm processing/tmp.$FILE_FORMAT
         fi
-        convert processing/tmp.$OUT_FORMAT -gravity North -splice 0x100 -pointsize 100 -annotate +0+50 $MEDDELANDE -append processing/tmp.$OUT_FORMAT # Add message
-        convert processing/tmp.$OUT_FORMAT -gravity South -splice 0x100 -pointsize 100 -annotate +0+50 $TELNUMMER -append processing/tmp.$OUT_FORMAT # Add phone number
+        convert processing/tmp.$OUT_FORMAT -gravity North -splice 0x100 -pointsize 100 -annotate +0+50 "$MEDDELANDE" -append processing/tmp.$OUT_FORMAT # Add message
+        convert processing/tmp.$OUT_FORMAT -gravity South -splice 0x100 -pointsize 100 -annotate +0+50 "$TELNUMMER" -append processing/tmp.$OUT_FORMAT # Add phone number
+        convert processing/tmp.$OUT_FORMAT -gravity South -splice 0x150 -pointsize 75 -annotate +0+20 "$ANNAT" -append processing/tmp.$OUT_FORMAT # Add other
         convert processing/tmp.$OUT_FORMAT -bordercolor Brown -border 10 processing/tmp.$OUT_FORMAT # Add border
         convert processing/tmp.$OUT_FORMAT \
         \( +clone -crop 16x16+0+0  -fill white -colorize 100% \
@@ -58,6 +60,7 @@ add_all_messages() {
         messages=$(ls input/$directory/ | tr ":" "\n")
         for message in $messages
         do
+            # Add data to QR code.
             add_message_number $directory ${message%.*}
         done
     done
@@ -79,13 +82,15 @@ generate_from_csv_file() {
     # Use CSV file as input to run pipeline.
     # Arguments is filename, expected to be of form: <number> <message>
     # Need a blank line at end of file to read last line.
-    csvtool readable $1 |while read -r NUMBER MESSAGE
+    csvtool readable $1 |while IFS=$';' read -r NUMBER MESSAGE OTHER
     do
         NUMBER=`echo $NUMBER | xargs`
         MESSAGE=`echo $MESSAGE | xargs`
+        OTHER=`echo $OTHER | xargs`
         get_qr_code $NUMBER $MESSAGE
+        add_message_number_other $NUMBER $MESSAGE "$OTHER"
     done
-    add_all_messages
+    # add_all_messages
     merge_images
 }
 
