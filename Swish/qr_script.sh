@@ -52,6 +52,7 @@ add_all_messages() {
     # Go through all QR codes in input/*/*, add message and number to those based on folder and filename.
     # Places output in processing/<number>/<message>.
     echo "Add message and number to all images in input directory."
+    mkdir -p input/ # Make sure folder exists.
     for directory in $(ls input/ | tr ":" "\n")
     do
         messages=$(ls input/$directory/ | tr ":" "\n")
@@ -66,8 +67,12 @@ merge_images() {
     # Merge all png files in processing/*/* into single PDF for printing.
     # Output stored as output/printable.pdf
     echo "Merge images to A4 PDF, ready for printing."
-    mkdir -p output/
-    montage -page A4 -bordercolor white -border 20x100 -tile 2x2 -geometry +4+4 processing/*/*.$OUT_FORMAT output/printable.pdf
+    mkdir -p output/ # Create output dir.
+    if [[ -d processing ]]; then
+        montage -page A4 -bordercolor white -border 20x100 -tile 2x2 -geometry +4+4 processing/*/*.$OUT_FORMAT output/printable.pdf
+    else
+        echo "No files in processing/ folder, skip montage"
+    fi
 }
 
 generate_from_csv_file() {
@@ -84,5 +89,5 @@ generate_from_csv_file() {
     merge_images
 }
 
-echo "Input argument should be s .csv file with <number> <message>."
+echo "Input argument should be s .csv file with <number> <message> in order to retrieve QR codes."
 generate_from_csv_file $1
