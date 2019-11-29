@@ -106,4 +106,5 @@ if [[ $# -gt 0 ]]; then
     generate_from_csv_file $1
 else
     add_all_messages
+    merge_images
 fi
