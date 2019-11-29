@@ -2,6 +2,10 @@
 # Generate PDF ready to print with QR codes, based on input from CSV file with columns <phone number> <message>.
 # Required tools are: imagemagick, csvtool.
 FILE_EXTENSION="png" # png is supported by both ImageMagick and Swish API. SVG converts terrible.
+BORDER_COLOR="Black"
+NUMBER_COLOR="Black"
+MESSAGE_COLOR="Black"
+OTHER_COLOR="Black"
 
 get_qr_code() {
     # Get static (prefilled) QR code from Swish. Phone number and message will be locked fields.
@@ -29,12 +33,12 @@ add_message_number_other() {
     if [[ ! -f processing/$PHONE_NUMBER/$MESSAGE.$FILE_EXTENSION ]]; then # Only execute if file does not exist, since it can take some time.
         echo "Add message and number to $PHONE_NUMBER; $MESSAGE; $OTHER"
         cp input/$PHONE_NUMBER/$MESSAGE.$FILE_EXTENSION processing/tmp.$FILE_EXTENSION # Make a copy to modify
-        convert processing/tmp.$FILE_EXTENSION -gravity North -splice 0x100 -pointsize 100 -annotate +0+50 "$MESSAGE" -append processing/tmp.$FILE_EXTENSION # Add message
-        convert processing/tmp.$FILE_EXTENSION -gravity South -splice 0x100 -pointsize 100 -annotate +0+50 "$PHONE_NUMBER" -append processing/tmp.$FILE_EXTENSION # Add phone number
+        convert processing/tmp.$FILE_EXTENSION -gravity North -splice 0x100 -fill "$MESSAGE_COLOR" -pointsize 100 -annotate +0+50 "$MESSAGE" -append processing/tmp.$FILE_EXTENSION # Add message
+        convert processing/tmp.$FILE_EXTENSION -gravity South -splice 0x100 -fill "$NUMBER_COLOR" -pointsize 100 -annotate +0+50 "$PHONE_NUMBER" -append processing/tmp.$FILE_EXTENSION # Add phone number
         if [[ ${#OTHER} -gt 0 ]]; then # Add extra text if available.
-            convert processing/tmp.$FILE_EXTENSION -gravity South -splice 0x150 -pointsize 75 -annotate +0+20 "$OTHER" -append processing/tmp.$FILE_EXTENSION # Add other text. Optional.
+            convert processing/tmp.$FILE_EXTENSION -gravity South -splice 0x150 -fill "$OTHER_COLOR" -pointsize 75 -annotate +0+20 "$OTHER" -append processing/tmp.$FILE_EXTENSION # Add other text. Optional.
         fi
-        convert processing/tmp.$FILE_EXTENSION -bordercolor Brown -border 10 processing/tmp.$FILE_EXTENSION # Add border
+        convert processing/tmp.$FILE_EXTENSION -bordercolor $BORDER_COLOR -border 10 processing/tmp.$FILE_EXTENSION # Add border
         convert processing/tmp.$FILE_EXTENSION \
         \( +clone -crop 16x16+0+0  -fill white -colorize 100% \
         -draw 'fill black circle 15,15 5,0' \
