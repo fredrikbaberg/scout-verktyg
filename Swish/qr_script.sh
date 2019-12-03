@@ -16,7 +16,7 @@ get_qr_code() {
     mkdir -p input/$PHONE_NUMBER
     if [[ ! -f input/$PHONE_NUMBER/$MESSAGE.$FILE_EXTENSION ]]; then
         echo "Get QR code for $PHONE_NUMBER $MESSAGE"
-        curl --data "$(jq -n --arg message "$MESSAGE" --arg phonenumber "$PHONE_NUMBER" --arg fileformat "$FILE_EXTENSION" '{format: $fileformat, size: 1000, message: {value: $message, editable: false}, payee: {value: $phonenumber, editable: false} }')" --header "Content-Type: application/json" --request POST https://mpc.getswish.net/qrg-swish/api/v1/prefilled --output input/$PHONE_NUMBER/$MESSAGE.$FILE_EXTENSION
+        curl --data "$(jq -n --arg message "$MESSAGE" --arg phonenumber "$PHONE_NUMBER" --arg fileformat "$FILE_EXTENSION" '{format: $fileformat, size: 1000, message: {value: $message, editable: false}, payee: {value: $phonenumber, editable: false}, amount: {value: 10, editable: true} }')" --header "Content-Type: application/json" --request POST https://mpc.getswish.net/qrg-swish/api/v1/prefilled --output input/$PHONE_NUMBER/$MESSAGE.$FILE_EXTENSION
     else
         echo "File for $PHONE_NUMBER; $MESSAGE already exists, will not retrieve again."
     fi
