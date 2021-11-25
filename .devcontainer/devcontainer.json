@@ -15,7 +15,9 @@
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
 		"tomoki1207.pdf",
-		"cssho.vscode-svgviewer"
+		"cssho.vscode-svgviewer",
+		"shakram02.bash-beautify",
+		"timonwong.shellcheck"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
