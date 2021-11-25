@@ -1,5 +1,6 @@
-*
-!.devcontainer/
+/*
+!.devcontainer
+!.gitignore
 !example.csv
 !qr_script.sh
 !README.md
