@@ -1,3 +1,5 @@
 *
-!qr_script.sh
+!.devcontainer/
 !example.csv
+!qr_script.sh
+!README.md
