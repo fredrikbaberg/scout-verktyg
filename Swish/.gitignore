@@ -2,5 +2,6 @@
 !.devcontainer
 !.gitignore
 !example.csv
+!generate.sh
 !qr_script.sh
 !README.md
