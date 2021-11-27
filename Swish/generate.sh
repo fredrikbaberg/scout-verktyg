@@ -8,7 +8,7 @@ NUMBER_COLOR="Black"
 MESSAGE_COLOR="Black"
 OTHER_COLOR="Black"
 FONT="Roboto"
-OUTPUT_DIR="generated"
+OUTPUT_DIR="generated_gen"
 
 get_qr_code() {
     # Get static (prefilled) QR code from Swish. Phone number and message will be locked fields.
@@ -46,21 +46,16 @@ add_details() {
     convert \
         "${OUTPUT_DIR}/qr/$PHONE_NUMBER/$FILENAME.$FILE_EXTENSION" \
         \
-        logo.svg \
-        -gravity center \
-        -geometry x200+400+0 \
-        -composite \
-        \
         -gravity North \
         -background none \
-        -splice 0x200 \
+        -splice 0x100 \
         -font "$FONT" \
         -fill "$MESSAGE_COLOR" \
         -pointsize 100 \
         -annotate +0+50 "$MESSAGE" \
         \
         -gravity South \
-        -splice 0x200 \
+        -splice 0x100 \
         -fill "$NUMBER_COLOR" \
         -pointsize 100 \
         -font "$FONT" \
@@ -77,6 +72,11 @@ add_details() {
         -compose Copy \
         -bordercolor transparent \
         -border 10 \
+        \
+        logo.svg \
+        -gravity northeast \
+        -geometry x200-820+00 \
+        -composite \
         \
         -alpha set \
         -compose Copy \
@@ -103,9 +103,10 @@ merge_images() {
     # Output is stored as $OUTPUT_DIR/output/printable.pdf
     echo "Merge images to A4 PDF, ready for printing."
     mkdir -p $OUTPUT_DIR/output/ # Create output dir.
+    rm -rf $OUTPUT_DIR/output/printable.pdf
     if [[ ! -e $OUTPUT_DIR/output/printable.pdf ]]; then
         if [[ -d $OUTPUT_DIR/processing ]]; then
-            montage -page A4 -bordercolor white -border 20x100 -tile 2x2 -geometry +4+4 $OUTPUT_DIR/processing/*/*.$FILE_EXTENSION $OUTPUT_DIR/output/printable.pdf
+            montage -page A4 -bordercolor white -border 80x40 -tile 2x2 -geometry +4+4 $OUTPUT_DIR/processing/*/*.$FILE_EXTENSION $OUTPUT_DIR/output/printable.pdf
         else
             echo "No files in processing/ folder, skip montage"
         fi

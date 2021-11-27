@@ -7,7 +7,7 @@ NUMBER_COLOR="Black"
 MESSAGE_COLOR="Black"
 OTHER_COLOR="Black"
 FONT="Roboto"
-OUTPUT_DIR="generated"
+OUTPUT_DIR="generated_qr"
 
 get_qr_code() {
     # Get static (prefilled) QR code from Swish. Phone number and message will be locked fields.
@@ -48,7 +48,9 @@ add_message_number_other() {
         \( +clone -flip \) \( +clone -flop \) \( +clone -flip \) \
         \) -flatten $OUTPUT_DIR/processing/tmp.$FILE_EXTENSION # Add rounded corners to frame
         convert $OUTPUT_DIR/processing/tmp.$FILE_EXTENSION -bordercolor White -border 5 $OUTPUT_DIR/processing/tmp.$FILE_EXTENSION # Add white border
-        composite -compose atop -geometry x100+25+25 -gravity northeast -background none logo.svg $OUTPUT_DIR/processing/tmp.$FILE_EXTENSION $OUTPUT_DIR/processing/tmp.$FILE_EXTENSION # Add logo
+        if [[ -f logo.svg ]]; then
+            composite -compose atop -geometry x175+20+20 -gravity northeast -background none logo.svg $OUTPUT_DIR/processing/tmp.$FILE_EXTENSION $OUTPUT_DIR/processing/tmp.$FILE_EXTENSION # Add logo
+        fi
         mv $OUTPUT_DIR/processing/tmp.$FILE_EXTENSION $OUTPUT_DIR/processing/$PHONE_NUMBER/$MESSAGE.$FILE_EXTENSION # Move modified image to destination.
     else
         echo "Processed file for $PHONE_NUMBER $MESSAGE already exists, skipping."
